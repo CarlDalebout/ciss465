@@ -1,11 +1,19 @@
 //main.cpp
 
 #include <iostream>
-#include "Room.h"
+#include "FileHandler.h"
 
 int main ()
 {
-  Room rooms;
-  rooms.parse_line("123 single_bed 193.45 1\n"); //room_number|room_type|room_price|available
+  FileHandler rooms;
+  rooms.load_file("rooms.txt");
+  std::cout << "finished parse_line \n";
+  for(int i = 0; i < c._info.size(); ++i)
+  {  
+    for(int j = 0; j < c._info[i].size(); ++j)
+    {
+      std::cout << "room: " << i << " item: " << j << " text: " << c._info[i][j] << '\n';
+    }
+  }
   return 0;
 }
