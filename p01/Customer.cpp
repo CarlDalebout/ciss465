@@ -1,77 +1,90 @@
 #include "Customer.h"
+#include <sstream>
 
-Customer::Customer()
-    : name_(""), room_number_(-1), phone_number_("") {}
-
-
-Customer::Customer(const std::string & name, int room_number,
-                   std::string phone_number)
-    : name_(name), room_number_(room_number), phone_number_(phone_number) {}
+Customer::Customer() {}
 
 
-std::string Customer::get_name() const { return name_; }
-
-
-int Customer::get_room() const { return room_number_; }
-
-
-std::string Customer::get_phone() const { return phone_number_; }
-
-
-void Customer::set_name(const std::string & name) { name_ = name; }
-
-
-void Customer::set_room(int room_number) { room_number_ = room_number; }
-
-
-void Customer::set_phone(std::string phone) { phone_number_ = phone; }
-
-
-bool Customer::has_room(int room) const
+void Customer::addcustomer(const std::string & name)
 {
-    return room_number_ == room;
+    customer_info c;
+    c.name = name;
+    c.assignedRoomNumber = -1;
+    customer_list.push_back(c);
 }
 
 
-void Customer::saveFile(std::ofstream & outFile) const
+void Customer::assignRoom(int index, int roomNumber)
 {
-    if (outFile.is_open())
+    if (index >= 0 && index < (int)customer_list.size())
+        customer_list[index].assignedRoomNumber == roomNumber;
+}
+
+
+void Customer::releaseRoom(int index)
+{
+    if (index >= 0 && index < (int)customer_list.size())
+        customer_list[index].assignedRoomNumber = -1;
+}
+
+
+std::string Customer::serialize() const
+{
+    std::string result = "";
+    for (int i = 0; i < customer_list.size(); ++i)
     {
-        outFile << name_ << "," << room_number_ << "," << phone_number_
-                << '\n';
+        result += customer_list[i].name + ',' +
+            std::to_string(customer_list[i].assignedRoomNumber);
+        if (i != customer_list.size() - 1)
+            result += '\n';
+    }
+    return result;
+}
+
+
+void Customer::deserialize(const std::string & data)
+{
+    customer_list.clear();
+    int start = 0;
+    int end;
+
+    while ((end = data.find('\n', start)) != std::string::npos)
+    {
+        std::string token = data.substr(start, end - start);
+        parseCustomer(token);
+        start = end + 1;
+    }
+    if (start < data.size())
+    {
+        std::string token = data.substr(start);
+        parseCustomer(token);
     }
 }
 
 
-bool Customer::loadFile(std::ifstream & inFile)
+void Customer::parseCustomer(const std::string & e)
 {
-    if (inFile.is_open())
+    int comma = e.find(',');
+    if (comma != std::string::npos)
     {
-        std::string line;
-        if (std::getline(inFile, line))
-        {
-            int pos1 = line.find(',');
-            int pos2 = line.find(',', pos1 + 1);
-
-            if (pos1 != std::string::npos && pos2 != std::string::npos)
-            {
-                name_ = line.substr(0, pos1);
-                room_number_ = std::stoi(line.substr(pos1 + 1,
-                                                     pos2 - pos1 - 1));
-                
-                phone_number_ = line.substr(pos2 + 1, pos2 - 1);
-                return true;
-            }
-        }
+        customer_info c;
+        c.name = e.substr(0, comma);
+        c.assignedRoomNumber = std::stoi(e.subtr(comma + 1));
+        customer_list.push_back(c)
     }
-    return false;
 }
-
-
 std::ostream & operator<<(std::ostream & cout, const Customer & c)
 {
-    cout << "Customer: " << c.get_name() << " | Room: "
-         << (c.get_room() == -1 ? "None" : std::to_string(c.get_room()))
-         << " | Phone: " << c.get_phone();
+    for (int i = 0; i < c.customer_list.size(); ++i)
+    {
+        cout << "Customer: " << c.customer_list[i].name
+             << " | Room Number: ";
+        if (c.customer_list[i].assignedRoomNumber == -1)
+            cout << "None";
+        else
+            cout << c.customer_list[i].assignedRoomNumber;
+
+        if (i != c.customer_list.size() - 1)
+            cout << '\n';
+    }
     return cout;
 }
