@@ -6,72 +6,30 @@
 #include <string>
 #include <vector>
 
+struct customer
+{
+  std::string name;
+  int assignedRoomNumber;
+  std::string phone_number;
+};
+
 class FileManagment
 {
   public: 
-    FileManagment() 
-    {
-    }
+    FileManagment()
+    {}
 
-    void parse_line(std::string line, char delim = ',')
-    {
-      std::string token = "";
-      std::vector<std::string> tokens;
+    void parse_line(std::string, char);
 
-      for(int i = 0; i < line.size(); ++i)
-      {
-        if(line[i] == delim || line[i] == '\n')
-        {
-          if(token == "")
-            continue;
-          tokens.push_back(token);
-          token = "";
-          continue;
-        }
-        token += line[i];
-      }
+    void load_file(std::string);
+    void save_file(std::string);
 
-      if(token != "")
-      {
-        tokens.push_back(token);
-        token = "";
-      }
+    void add_row(std::vector<std::string>);
+    
+    std::vector<std::string>& operator[](int);
+    const std::vector<std::string>& operator[](int) const;
 
-      _info.push_back(tokens);
-    }
-
-    void load_file(std::string file_name)
-    {
-      std::ifstream file(file_name);
-      std::string line;
-
-      while(std::getline(file, line)) // line formate room_number|room_type|room_price|available
-      {
-        parse_line(line);
-      }
-    }
-
-  std::vector<std::string>& operator[](int index) {
-        if (index < 0 || index >= _info .size()) {
-            std::cerr << "Error: Index out of bounds!" << std::endl;
-            // In a real application, you might throw an exception
-            // For simplicity, we'll return a reference to a dummy value or exit
-            exit(EXIT_FAILURE); 
-        }
-        return _info[index];
-    }
-
-    const std::vector<std::string>& operator[](int index) const {
-        if (index < 0 || index >= _info.size()) {
-            std::cerr << "Error: Index out of bounds!" << std::endl;
-            // In a real application, you might throw an exception
-            // For simplicity, we'll return a reference to a dummy value or exit
-            exit(EXIT_FAILURE);
-        }
-        return _info[index];
-    }
-
-    friend std::ostream& operator<<(std::ostream&, const FileManagment&);
+   friend std::ostream& operator<<(std::ostream&, const FileManagment&);
 
   private:
     std::vector<std::vector<std::string>> _info;
