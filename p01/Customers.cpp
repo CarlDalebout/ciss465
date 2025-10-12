@@ -6,9 +6,9 @@ Customers::Customers()
 :_info(std::vector<customer>())
 {}
 
-void Customers::addCustomers(std::string name, int roomNumber, std::string phone_number)
+void Customers::addCustomers(int customerID, std::string name, int roomNumber, std::string phone_number)
 {
-  _info.push_back(customer{name, roomNumber, phone_number});
+  _info.push_back(customer{customerID, name, roomNumber, phone_number});
 }
 
 void Customers::addCustomers(const customer& c)
@@ -16,9 +16,47 @@ void Customers::addCustomers(const customer& c)
   _info.push_back(c);
 }
 
+void Customers::bookRoom(int customerID, int roomNumber)
+{
+  bool found_room = false;
+  for(int i = 0; i < _info.size(); i++)
+  {
+    if(_info[i].customerID == customerID)
+    {
+      std::cout << "booking room: " << roomNumber << std::endl;
+      _info[i].roomNumber= roomNumber;
+      found_room = true;
+    }
+  }
+
+  if(found_room)
+    std::cout << "The room has been booked\n";
+  else
+    std::cout << "\n\n\nThere is no room with that number\n\n\n";
+}
+
+void Customers::freeRoom(int customerID)
+{
+  bool found_room = false;
+  for(int i = 0; i < _info.size(); i++)
+  {
+    if(_info[i].customerID == customerID)
+    {
+      std::cout << "freeing room" << _info[i].roomNumber << std::endl;
+      _info[i].roomNumber = -1;
+      found_room = true;
+    }
+  }
+
+  if(found_room)
+    std::cout << "The room has been freed\n";
+  else
+    std::cout << "\n\n\nThere is no room with that number\n\n\n";
+}
+
 bool compareRoomNumbers(const customer& customer1, const customer& customer2)
 {
-  return customer1.roomNumber < customer2.roomNumber;
+  return customer1.customerID < customer2.customerID;
 }
 
 void Customers::sort()
@@ -38,6 +76,9 @@ void Customers::saveFile() const
 
   for (const customer& i : _info) 
   {
+    // Write customerID
+    file.write(reinterpret_cast<const char*>(&i.customerID), sizeof(i.customerID));
+
     // Write string length + characters
     size_t len = i.name.size();
     file.write(reinterpret_cast<const char*>(&len), sizeof(len));
@@ -68,6 +109,9 @@ void Customers::loadFile()
   {
     customer temp;
 
+    // Room number
+    file.read(reinterpret_cast<char*>(&temp.customerID), sizeof(temp.customerID));
+
     // String length + name
     size_t len;
     if(!file.read(reinterpret_cast<char*>(&len), sizeof(len)))
@@ -93,8 +137,9 @@ std::ostream & operator<<(std::ostream & cout, const Customers & c)
 {
   for(const customer& i : c._info)
   {
-    cout << "Name: " << i.name
-         << " | Room Number: " << i.roomNumber
+    cout << "CustomerID: "      << i.customerID
+         << " | Name: "            << i.name
+         << " | Room Number: "  << i.roomNumber
          << " | Phone Number: " << i.phone_number
          << std::endl;
   }

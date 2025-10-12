@@ -32,7 +32,7 @@ void Rooms::freeRoom(int roomNumber)
   {
     if(_info[i].roomNumber == roomNumber)
     {
-      std::cout << "booking room: " << roomNumber << std::endl;
+      std::cout << "freeing room: " << roomNumber << std::endl;
       _info[i].available = true;
       found_room = true;
     }

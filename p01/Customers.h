@@ -8,6 +8,7 @@
 
 struct customer
 {
+  int customerID;
   std::string name;
   int roomNumber;
   std::string phone_number;
@@ -18,8 +19,11 @@ class Customers
 public:
   Customers();
   
-  void addCustomers(std::string, int, std::string);
+  void addCustomers(int, std::string, int, std::string);
   void addCustomers(const customer&);
+
+  void bookRoom(int, int);
+  void freeRoom(int);
 
   void sort();
   void saveFile() const;
